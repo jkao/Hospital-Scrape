@@ -30,6 +30,18 @@ profile_index.each do |link|
   name = profile_page.search('//h4[1]')
   excel_string = name.text + "\t"
   #puts name.text
+  
+  # E-mail
+  profile_email = profile_page.link_with(:href => /mailto:/)
+
+  if profile_email.nil?
+    #puts "N/A"
+    excel_string << "N/A\t"
+  else
+    #puts profile_email.text
+    excel_string << profile_email.text + "\t"
+  end
+
 
   # Research Interests 
   # Get exclusion of start H4 and next H4
@@ -40,7 +52,7 @@ profile_index.each do |link|
 
   research_interests.each do |interest|
     #puts interest.text
-    excel_string << interest.text + "\n"
+    excel_string << interest.text + " "
   end
   excel_string << "\t"
 
@@ -53,20 +65,9 @@ profile_index.each do |link|
 
   research_activities.each do |activity|
     #puts activity.text
-    excel_string << activity.text + "\n"
+    excel_string << activity.text + " "
   end
   excel_string << "\t"
-  
-  # E-mail
-  profile_email = profile_page.link_with(:href => /mailto:/)
-
-  if profile_email.nil?
-    #puts "N/A"
-    excel_string << "N/A\t"
-  else
-    #puts profile_email.text
-    excel_string << profile_email.text + "\t"
-  end
 
   # Process Contact Information
   contact_array = contact_block.text
