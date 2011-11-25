@@ -13,6 +13,9 @@ url = 'http://www.stmichaelshospital.com/research/profilelist.php'
 page = agent.get url
 profile_index = page.links_with(:href => /profile.php/)
 
+# Excel Header
+file.puts "Name:\tResearch Interests:\tResearch Activities:\tEmail:\tPhone #:\tFax #:"
+
 # Scrape the Profile Links
 profile_index.each do |link|
   puts "Scanning... " + link.href
@@ -25,39 +28,44 @@ profile_index.each do |link|
 
   # Name
   name = profile_page.search('//h4[1]')
-  file.puts "Name: "
-  file.puts name.text
+  excel_string = name.text + "\t"
+  #puts name.text
 
   # Research Interests 
   # Get exclusion of start H4 and next H4
   research_interests_top = profile_page.search('//h4[text()="Research Interests"]/following-sibling::p')
-  research_interests_below = profile_page.search('//h4[text()="Research Interests"]/following-sibling::h4[1]//following-sibling::*|//h4[text()="Research Interests"]/following-sibling::h4[1]//self::*')
+  research_interests_below = profile_page.search('//h4[text()="Research Interests"]/following-sibling::h4[1]//following-sibling::*|' +
+                                                  '//h4[text()="Research Interests"]/following-sibling::h4[1]//self::*')
   research_interests = research_interests_top - research_interests_below
 
-  file.puts "Research Interests:"
   research_interests.each do |interest|
-    file.puts interest.text
+    #puts interest.text
+    excel_string << interest.text + "\n"
   end
+  excel_string << "\t"
 
   # Research Activities 
   # Get exclusion of start H4 and next H4
   research_activities_top = profile_page.search('//h4[text()="Research Activities"]/following-sibling::*')
-  research_activities_below = profile_page.search('//h4[text()="Research Activities"]/following-sibling::h4[1]//following-sibling::*|//h4[text()="Research Activities"]/following-sibling::h4[1]//self::*')
+  research_activities_below = profile_page.search('//h4[text()="Research Activities"]/following-sibling::h4[1]//following-sibling::*|' + 
+                                                  '//h4[text()="Research Activities"]/following-sibling::h4[1]//self::*')
   research_activities = research_activities_top - research_activities_below
 
-  file.puts "Research Activities:"
   research_activities.each do |activity|
-    file.puts activity.text
+    #puts activity.text
+    excel_string << activity.text + "\n"
   end
+  excel_string << "\t"
   
   # E-mail
   profile_email = profile_page.link_with(:href => /mailto:/)
 
-  file.puts "E-mail:" 
   if profile_email.nil?
-    file.puts "N/A"
+    #puts "N/A"
+    excel_string << "N/A\t"
   else
-    file.puts profile_email.text
+    #puts profile_email.text
+    excel_string << profile_email.text + "\t"
   end
 
   # Process Contact Information
@@ -71,24 +79,25 @@ profile_index.each do |link|
   fax_dne = contact_block.text.match(/fax/i).nil?
   
   # Phone
-  file.puts "Phone #:"
   if phone_dne
-    file.puts "N/A"
+    #puts "N/A"
+    excel_string << "N/A\t"
   else
-    file.puts contact_array[0]
+    #puts contact_array[0]
+    excel_string << contact_array[0] + "\t"
   end
 
   # Fax - Second Entry if it Exists
-  file.puts "Fax #:"
   if fax_dne
-    file.puts "N/A"
+    #puts "N/A"
+    excel_string << "N/A\t"
   else
-    file.puts contact_array[1]
+    #puts contact_array[1]
+    excel_string << contact_array[1] 
   end
 
-  file.puts "\n"
+  file.puts excel_string
 
-  agent.back
 end
 
 puts "Done"
