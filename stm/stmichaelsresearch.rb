@@ -1,4 +1,5 @@
-require 'rubygems'
+# Essentially, all we're doing is scraping data and putting it in a tab-delimited format
+# So that we can quickly copy and paste in to excel
 require 'mechanize'
 
 file_name = "stmichaels.txt"
