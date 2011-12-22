@@ -1,5 +1,3 @@
-#!/usr/bin/ruby
-
 require 'rubygems'
 require 'mechanize'
 
